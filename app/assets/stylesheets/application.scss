@@ -67,6 +67,7 @@ body {
   }
   #result_disp {
     display: none;
+    font-family: monospace;
     #reset {
       @include button_style;
     }

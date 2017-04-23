@@ -113,7 +113,8 @@
           correct_num++
           correction_num += correct[i]
         else
-          correction_num += "<span style='color:#ff7300;'>" + correct[i] + "</span>"
+          if answer[i] is undefined then correction_num += "<span style='color:#ff7300;'>_</span>"
+          else correction_num += "<span style='color:#ff7300;'>" + answer[i] + "</span>"
       result_record = correct_num + "/" + correct.length + "( " + ((correct_num / correct.length) * 100).toFixed(1) + "%)"
       return [correction_num, result_record]
     # 採点結果を描画するための関数
@@ -141,14 +142,16 @@
       # レベル情報表示画面 => 問題画面を表示する画面
       screenTransition($level_info_disp, $show_num_disp, LEVEL_INFO_DISP_TIME)
       # 記憶対象となる数値を表示する画面 => 回答画面
-      screenTransition($show_num_disp, $answer_disp, level_info_array[2] * 1000)
+      screenTransition($show_num_disp, $answer_disp, (LEVEL_INFO_DISP_TIME + level_info_array[2] * 1000))
     # 回答ボタン選択時
     $answerBtn.click ->
-      # 回答画面 => 結果を表示する画面
+      # 回答画面 => 結果表示画面
       screenTransition($answer_disp, $result_disp, DONT_WAIT_TIME)
       [correction_num, result_record] = checkAnswer($answerInput.val(), $show_num_disp.text())
       generateResultDisp(correction_num, result_record)
     # 「レベルを選択する」ボタンを押した時
     $reset.click ->
+      # 諸々を初期化用関数
       init()
+      # 結果表示画面 => レベル選択画面
       screenTransition($result_disp, $level_disp, DONT_WAIT_TIME)
