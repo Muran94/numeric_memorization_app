@@ -54,6 +54,13 @@ body {
   }
   #answer_disp {
     display: none;
+    #answerInput {
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 3px;
+      text-align: center;
+      font-size: 16px;
+    }
     #answerBtn {
       @include button_style;
     }

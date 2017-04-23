@@ -77,7 +77,7 @@
 
     ## グローバル変数・定数
     DONT_WAIT_TIME = 0
-    LEVEL_INFO_DISP_TIME = 1000
+    LEVEL_INFO_DISP_TIME = 1500
 
 
     ## 関数
@@ -101,6 +101,9 @@
     setCorrectAnswerToDisp = (memorize_this_num) ->
       $show_num_disp.text(memorize_this_num)
       $correct_num.text(memorize_this_num)
+    # 回答フォームの入力の上限値を追加する
+    setMaxLengthToInput = (max_length) ->
+      $answerInput.attr('maxlength', max_length)
     # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
       correct_num = 0
@@ -131,6 +134,8 @@
       setLevelInfoDisp(level_info_array)
       # 問題画面と結果画面に正解をセットする
       setCorrectAnswerToDisp(generateNum(level_info_array[1]))
+      # 回答フォームの入力の上限値を追加する
+      setMaxLengthToInput(level_info_array[1])
       # レベル選択画面 => レベル情報画面
       screenTransition($level_disp, $level_info_disp, DONT_WAIT_TIME)
       # レベル情報表示画面 => 問題画面を表示する画面
