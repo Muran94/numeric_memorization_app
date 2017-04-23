@@ -56,10 +56,17 @@ body {
     display: none;
     #answerInput {
       border: 1px solid #ccc;
-      padding: 5px;
+      padding: 7px;
+      line-height: 1.5;
       border-radius: 3px;
       text-align: center;
-      font-size: 16px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    #answerErrorBox {
+      color: tomato;
+      font-size: 14px;
+      margin-bottom: 13px;
     }
     #answerBtn {
       @include button_style;
