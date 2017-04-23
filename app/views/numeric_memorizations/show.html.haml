@@ -1,0 +1,127 @@
+#container
+  #level_disp
+    %ul
+      - 10.times do |num|
+        %li.level_btn{value: num + 1}
+          = "LEVEL #{num + 1}"
+
+  #level_info_disp
+    %table
+      %tr
+        %th レベル
+      %tr
+        %td#level_info_level 1
+      %tr
+        %th 桁数
+      %tr
+        %td 10
+      %tr
+        %th 制限時間
+      %tr
+        %td 60秒
+
+  #show_num_disp
+
+  #answer_disp
+    %input#answerInput{type: "tel"}
+    #answerBtn 答える
+
+  #result_disp
+    %table
+      %tr
+        %th あなたの回答
+      %tr
+        %td#submission_num
+      %tr
+        %th 正解
+      %tr
+        %td#correct_num
+      %tr
+        %th 成績
+      %tr
+        %td#result_record
+    #reset レベルを選択する
+
+
+:coffee
+  $ ->
+    ## プロパティー
+    # レベル選択画面のプロパティー
+    $level_disp = $('#level_disp')
+    $level_btn = $('.level_btn')
+    # レベル情報表示画面のプロパティー
+    $level_info_disp = $('#level_info_disp')
+    # 記憶対象となる数値を表示する画面のプロパティー
+    $show_num_disp = $('#show_num_disp')
+    # 回答画面のプロパティー
+    $answer_disp = $('#answer_disp')
+    $answerInput = $('#answerInput') # 回答フォーム
+    $answerBtn = $('#answerBtn') # 回答ボタン
+    # 結果を表示する画面
+    $result_disp = $('#result_disp')
+    $submission_num = $('#submission_num')
+    $correct_num = $('#correct_num')
+    $result_record = $('#result_record')
+    $reset = $('#reset')
+
+    ## グローバル変数・定数
+    DONT_WAIT_TIME = 0
+    LEVEL_INFO_DISP_TIME = 1000
+
+    ## 関数
+    # 画面遷移用関数
+    screenTransition = (current, to, time) ->
+      setTimeout ->
+        current.hide()
+        to.fadeIn()
+      , time
+    # 記憶対象の数値を生成する関数
+    generateNum = (digit) ->
+      problemNum = ""
+      for i in [1..digit] then problemNum += String(Math.floor(Math.random() * 10))
+      return problemNum
+    # 採点関数
+    checkAnswer = (answer, correct) ->
+      correct_num = 0
+      correction_num = ""
+      for i in [0...correct.length]
+        if answer[i] is correct[i]
+          correct_num++
+          correction_num += correct[i]
+        else
+          correction_num += "<span style='color:#ff7300;'>" + correct[i] + "</span>"
+      result_record = correct_num + "/" + correct.length + "( " + ((correct_num / correct.length) * 100).toFixed(1) + "%)"
+      return [correction_num, result_record]
+    # 採点結果を描画するための関数
+    generateResultDisp = (correction_num, result_record) ->
+      $submission_num.html(correction_num)
+      $result_record.text(result_record)
+    # 諸々を初期化用関数
+    init = ->
+      $answerInput.val("")
+
+    ## イベント処理
+    # レベル選択時
+    $level_btn.click ->
+      level = $(this).val()
+      digit = 10
+      memorize_this_num = generateNum(digit) # メモ:レベルごとの桁数を引数に渡す
+      show_problem_time = LEVEL_INFO_DISP_TIME + 1000 # メモ:レベルごとの制限時間を足す
+      $show_num_disp.text(memorize_this_num)
+      $correct_num.text(memorize_this_num)
+      # レベル選択画面 => レベル情報表示画面
+      screenTransition($level_disp, $level_info_disp, DONT_WAIT_TIME)
+      # レベル情報表示画面 => 記憶対象となる数値を表示する画面
+      screenTransition($level_info_disp, $show_num_disp, LEVEL_INFO_DISP_TIME)
+      # 記憶対象となる数値を表示する画面 => 回答画面
+      screenTransition($show_num_disp, $answer_disp, show_problem_time)
+    # 回答ボタン選択時
+    $answerBtn.click ->
+      # 回答画面 => 結果を表示する画面
+      screenTransition($answer_disp, $result_disp, DONT_WAIT_TIME)
+      [correction_num, result_record] = checkAnswer($answerInput.val(), $show_num_disp.text())
+      generateResultDisp(correction_num, result_record)
+    # 「レベルを選択する」ボタンを押した時
+    $reset.click ->
+      init()
+      screenTransition($result_disp, $level_disp, DONT_WAIT_TIME)
