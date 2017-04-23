@@ -1,24 +1,31 @@
 #container
   #level_disp
     %ul
-      - 10.times do |num|
-        %li.level_btn{value: num + 1}
-          = "LEVEL #{num + 1}"
+      %li.level_btn{"data-level_info" => [1, 10, 60]} LEVEL1
+      %li.level_btn{"data-level_info" => [2, 10, 50]} LEVEL2
+      %li.level_btn{"data-level_info" => [3, 10, 40]} LEVEL3
+      %li.level_btn{"data-level_info" => [4, 10, 30]} LEVEL4
+      %li.level_btn{"data-level_info" => [5, 10, 20]} LEVEL5
+      %li.level_btn{"data-level_info" => [6, 10, 10]} LEVEL6
+      %li.level_btn{"data-level_info" => [7, 15, 20]} LEVEL7
+      %li.level_btn{"data-level_info" => [8, 15, 15]} LEVEL8
+      %li.level_btn{"data-level_info" => [9, 20, 20]} LEVEL9
+      %li.level_btn{"data-level_info" => [10, 30, 30]} LEVEL10
 
   #level_info_disp
     %table
       %tr
         %th レベル
       %tr
-        %td#level_info_level 1
+        %td#level_info_level
       %tr
         %th 桁数
       %tr
-        %td 10
+        %td#level_info_digit
       %tr
         %th 制限時間
       %tr
-        %td 60秒
+        %td#level_info_time
 
   #show_num_disp
 
@@ -49,9 +56,12 @@
     # レベル選択画面のプロパティー
     $level_disp = $('#level_disp')
     $level_btn = $('.level_btn')
-    # レベル情報表示画面のプロパティー
+    # レベル情報画面のプロパティー
     $level_info_disp = $('#level_info_disp')
-    # 記憶対象となる数値を表示する画面のプロパティー
+    $level_info_level = $('#level_info_level')
+    $level_info_digit = $('#level_info_digit')
+    $level_info_time = $('#level_info_time')
+    # 問題画面を表示する画面のプロパティー
     $show_num_disp = $('#show_num_disp')
     # 回答画面のプロパティー
     $answer_disp = $('#answer_disp')
@@ -64,9 +74,11 @@
     $result_record = $('#result_record')
     $reset = $('#reset')
 
+
     ## グローバル変数・定数
     DONT_WAIT_TIME = 0
     LEVEL_INFO_DISP_TIME = 1000
+
 
     ## 関数
     # 画面遷移用関数
@@ -80,7 +92,16 @@
       problemNum = ""
       for i in [1..digit] then problemNum += String(Math.floor(Math.random() * 10))
       return problemNum
-    # 採点関数
+    # レベル情報画面にレベル情報をセット
+    setLevelInfoDisp = (level_info_array) ->
+      $level_info_level.text(level_info_array[0])
+      $level_info_digit.text(level_info_array[1])
+      $level_info_time.text(level_info_array[2] + '秒')
+    # 問題画面と結果画面に正解をセットする
+    setCorrectAnswerToDisp = (memorize_this_num) ->
+      $show_num_disp.text(memorize_this_num)
+      $correct_num.text(memorize_this_num)
+    # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
       correct_num = 0
       correction_num = ""
@@ -100,21 +121,22 @@
     init = ->
       $answerInput.val("")
 
+
     ## イベント処理
     # レベル選択時
     $level_btn.click ->
-      level = $(this).val()
-      digit = 10
-      memorize_this_num = generateNum(digit) # メモ:レベルごとの桁数を引数に渡す
-      show_problem_time = LEVEL_INFO_DISP_TIME + 1000 # メモ:レベルごとの制限時間を足す
-      $show_num_disp.text(memorize_this_num)
-      $correct_num.text(memorize_this_num)
-      # レベル選択画面 => レベル情報表示画面
+      # 選択したレベルの情報を配列として取得。[レベル, 桁数, 秒数]が入る。
+      level_info_array = $(this).data('level_info')
+      # レベル情報画面にレベル情報をセット
+      setLevelInfoDisp(level_info_array)
+      # 問題画面と結果画面に正解をセットする
+      setCorrectAnswerToDisp(generateNum(level_info_array[1]))
+      # レベル選択画面 => レベル情報画面
       screenTransition($level_disp, $level_info_disp, DONT_WAIT_TIME)
-      # レベル情報表示画面 => 記憶対象となる数値を表示する画面
+      # レベル情報表示画面 => 問題画面を表示する画面
       screenTransition($level_info_disp, $show_num_disp, LEVEL_INFO_DISP_TIME)
       # 記憶対象となる数値を表示する画面 => 回答画面
-      screenTransition($show_num_disp, $answer_disp, show_problem_time)
+      screenTransition($show_num_disp, $answer_disp, level_info_array[2] * 1000)
     # 回答ボタン選択時
     $answerBtn.click ->
       # 回答画面 => 結果を表示する画面
