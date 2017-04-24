@@ -7,11 +7,23 @@
 @import "font-awesome-sprockets";
 @import "font-awesome";
 
+@font-face{
+  font-family: 'custom1';
+  src: font-url('03-smartphone-ui.otf') format('truetype');
+  font-weight:normal;
+  font-style:normal;
+}
+
 @mixin button_style {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   display: block;
   width: 70%;
-  margin: 0 auto 10px;
-  background: #26b9d2;
+  padding: 7px;
+  background: #1cd929;
   border-radius: 3px;
   color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -20,12 +32,12 @@
 }
 
 body {
-  font-family: 'Century Gothic';
   font-size: 24px;
+  font-family: 'custom1';
 }
 
 header {
-  height: 40px;
+  height: 50px;
   width: 100%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   text-align: center;
@@ -36,7 +48,7 @@ header {
     color: #fff;
     font-weight: bold;
     font-size: 24px;
-    line-height: 40px;
+    line-height: 50px;
   }
 }
 
@@ -61,7 +73,7 @@ header {
         letter-spacing: 1.5px;
         width: 48%;
         padding: 5px;
-        background: #26b9d2;
+        background: #1cd929;
         text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
         color: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -137,11 +149,6 @@ header {
     font-family: monospace;
   }
   .reset {
-    position: fixed;
-    bottom: 30px;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
     @include button_style;
   }
 }
