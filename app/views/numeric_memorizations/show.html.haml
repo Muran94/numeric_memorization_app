@@ -43,24 +43,9 @@
         .level_info
           30桁 | 30秒
 
-  #level_info_disp
-    %table
-      %tr
-        %th レベル
-      %tr
-        %td#level_info_level
-      %tr
-        %th 桁数
-      %tr
-        %td#level_info_digit
-      %tr
-        %th 制限時間
-      %tr
-        %td#level_info_time
-
   #show_num_disp
     %span#show_num_area
-    %span#count_down_disp 10
+    %span#count_down_disp
     .reset レベル選択
 
   #answer_disp
@@ -91,11 +76,6 @@
     # レベル選択画面のプロパティー
     $level_disp = $('#level_disp')
     $level_btn = $('.level_btn')
-    # レベル情報画面のプロパティー
-    $level_info_disp = $('#level_info_disp')
-    $level_info_level = $('#level_info_level')
-    $level_info_digit = $('#level_info_digit')
-    $level_info_time = $('#level_info_time')
     # 問題画面を表示する画面のプロパティー
     $show_num_disp = $('#show_num_disp')
     $show_num_area = $('#show_num_area')
@@ -134,11 +114,6 @@
       problemNum = ""
       for i in [1..digit] then problemNum += String(Math.floor(Math.random() * 10))
       return problemNum
-    # レベル情報画面にレベル情報をセット
-    setLevelInfoDisp = (level_info_array) ->
-      $level_info_level.text(level_info_array[0])
-      $level_info_digit.text(level_info_array[1])
-      $level_info_time.text(level_info_array[2] + '秒')
     # 問題画面と結果画面に正解をセットする
     setCorrectAnswerToDisp = (memorize_this_num) ->
       $show_num_area.text(memorize_this_num)
@@ -152,8 +127,8 @@
         clearTimeout(timerIDForCountDown)
         return
       timerIDForCountDown = setTimeout ->
-        $count_down_disp.text((time / SECOND).toFixed())
         time -= SECOND
+        $count_down_disp.text((time / SECOND).toFixed())
         countDownTimer(time, digit)
       , SECOND
     # 採点結果を取得するための関数
@@ -175,7 +150,6 @@
       $result_record.text(result_record)
     # レベル選択画面に遷移するための関数
     transitionToLevelDisp = ->
-      $level_info_disp.hide()
       $show_num_disp.hide()
       $answer_disp.hide()
       $result_disp.hide()
@@ -194,19 +168,16 @@
     $level_btn.click ->
       # 選択したレベルの情報を配列として取得。[レベル, 桁数, 秒数]が入る。
       level_info_array = $(this).data('level_info')
-      time_until_answer_disp_is_showed = LEVEL_INFO_DISP_TIME + (level_info_array[2] * 1000)
-      # レベル情報画面にレベル情報をセット
-      setLevelInfoDisp(level_info_array)
+      time_until_answer_disp_is_showed = level_info_array[2] * 1000
       # 問題画面と結果画面に正解をセットする
       setCorrectAnswerToDisp(generateNum(level_info_array[1]))
       # 回答フォームの入力の上限値を追加する
       setMaxLengthToInput(level_info_array[1])
-      # レベル選択画面 => レベル情報画面
-      screenTransition($level_disp, $level_info_disp, DONT_WAIT_TIME)
-      # レベル情報表示画面 => 問題画面を表示する画面
-      screenTransition($level_info_disp, $show_num_disp, LEVEL_INFO_DISP_TIME)
+      # レベル選択画面 => 問題画面
+      screenTransition($level_disp, $show_num_disp, DONT_WAIT_TIME)
       # 記憶対象となる数値を表示する画面 => 回答画面
-      setTimeout(countDownTimer(level_info_array[2] * 1000, level_info_array[1]), LEVEL_INFO_DISP_TIME)
+      $count_down_disp.text((time_until_answer_disp_is_showed / SECOND).toFixed())
+      countDownTimer(time_until_answer_disp_is_showed, level_info_array[1])
       screenTransition($show_num_disp, $answer_disp, time_until_answer_disp_is_showed)
     # 回答ボタン選択時
     $answerBtn.click ->
