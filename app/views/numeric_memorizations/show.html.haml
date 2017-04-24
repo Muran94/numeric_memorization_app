@@ -1,18 +1,47 @@
--# @TODO レベルボタンに桁数と秒数を表示
--# @TODO カウントダウン用ディスプレイを作成
+-# @TODO レベル選択ボタンを動的に作成できるようにする。
 #container
   #level_disp
     %ul
-      %li.level_btn{"data-level_info" => [1, 10, 60]} LEVEL1
-      %li.level_btn{"data-level_info" => [2, 10, 50]} LEVEL2
-      %li.level_btn{"data-level_info" => [3, 10, 40]} LEVEL3
-      %li.level_btn{"data-level_info" => [4, 10, 30]} LEVEL4
-      %li.level_btn{"data-level_info" => [5, 10, 20]} LEVEL5
-      %li.level_btn{"data-level_info" => [6, 10, 10]} LEVEL6
-      %li.level_btn{"data-level_info" => [7, 15, 20]} LEVEL7
-      %li.level_btn{"data-level_info" => [8, 15, 15]} LEVEL8
-      %li.level_btn{"data-level_info" => [9, 20, 20]} LEVEL9
-      %li.level_btn{"data-level_info" => [10, 30, 30]} LEVEL10
+      %li.level_btn{"data-level_info" => [1, 10, 60]}
+        LEVEL1
+        .level_info
+          10桁 | 60秒
+      %li.level_btn{"data-level_info" => [2, 10, 50]}
+        LEVEL2
+        .level_info
+          10桁 | 50秒
+      %li.level_btn{"data-level_info" => [3, 10, 40]}
+        LEVEL3
+        .level_info
+          10桁 | 40秒
+      %li.level_btn{"data-level_info" => [4, 10, 30]}
+        LEVEL4
+        .level_info
+          10桁 | 30秒
+      %li.level_btn{"data-level_info" => [5, 10, 20]}
+        LEVEL5
+        .level_info
+          10桁 | 20秒
+      %li.level_btn{"data-level_info" => [6, 10, 10]}
+        LEVEL6
+        .level_info
+          10桁 | 10秒
+      %li.level_btn{"data-level_info" => [7, 15, 20]}
+        LEVEL7
+        .level_info
+          15桁 | 20秒
+      %li.level_btn{"data-level_info" => [8, 15, 15]}
+        LEVEL8
+        .level_info
+          15桁 | 15秒
+      %li.level_btn{"data-level_info" => [9, 20, 20]}
+        LEVEL9
+        .level_info
+          20桁 | 20秒
+      %li.level_btn{"data-level_info" => [10, 30, 30]}
+        LEVEL10
+        .level_info
+          30桁 | 30秒
 
   #level_info_disp
     %table
@@ -30,6 +59,9 @@
         %td#level_info_time
 
   #show_num_disp
+    %span#show_num_area
+    %span#count_down_disp 10
+    .reset レベル選択
 
   #answer_disp
     %input#answerInput{type: "tel"}
@@ -50,7 +82,7 @@
         %th 成績
       %tr
         %td#result_record
-    #reset レベルを選択する
+    .reset レベルを選択する
 
 
 :coffee
@@ -66,6 +98,8 @@
     $level_info_time = $('#level_info_time')
     # 問題画面を表示する画面のプロパティー
     $show_num_disp = $('#show_num_disp')
+    $show_num_area = $('#show_num_area')
+    $count_down_disp = $('#count_down_disp')
     # 回答画面のプロパティー
     $answer_disp = $('#answer_disp')
     $answerInput = $('#answerInput') # 回答フォーム
@@ -76,21 +110,25 @@
     $submission_num = $('#submission_num')
     $correct_num = $('#correct_num')
     $result_record = $('#result_record')
-    $reset = $('#reset')
+    $reset = $('.reset')
 
 
-    ## グローバル変数・定数
+    ## グローバル変数・定数定義
     DONT_WAIT_TIME = 0
     LEVEL_INFO_DISP_TIME = 1500
     REGEX = /^[0-9]*$/
+    SECOND = 1000
+    timerIds = []
+    timerIDForCountDown = null
 
 
     ## 関数
     # 画面遷移用関数
     screenTransition = (current, to, time) ->
-      setTimeout ->
+      timerIds[timerIds.length] = setTimeout ->
         current.hide()
         to.fadeIn()
+        console.log timerIds
       , time
     # 記憶対象の数値を生成する関数
     generateNum = (digit) ->
@@ -104,11 +142,21 @@
       $level_info_time.text(level_info_array[2] + '秒')
     # 問題画面と結果画面に正解をセットする
     setCorrectAnswerToDisp = (memorize_this_num) ->
-      $show_num_disp.text(memorize_this_num)
+      $show_num_area.text(memorize_this_num)
       $correct_num.text(memorize_this_num)
     # 回答フォームの入力の上限値を追加する
     setMaxLengthToInput = (max_length) ->
       $answerInput.attr('maxlength', max_length)
+    # カウントダウンタイマーを更新するための関数
+    countDownTimer = (time, digit) ->
+      if time < 0
+        clearTimeout(timerIDForCountDown)
+        return
+      timerIDForCountDown = setTimeout ->
+        $count_down_disp.text((time / SECOND).toFixed())
+        time -= SECOND
+        countDownTimer(time, digit)
+      , SECOND
     # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
       correct_num = 0
@@ -118,18 +166,28 @@
           correct_num++
           correction_num += correct[i]
         else
-          if answer[i] is undefined then correction_num += "<span style='color:#ff7300;'>_</span>"
-          else correction_num += "<span style='color:#ff7300;'>" + answer[i] + "</span>"
+          if answer[i] is undefined then correction_num += "<span style='color:tomato;'>_</span>"
+          else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
       result_record = correct_num + "/" + correct.length + " (" + ((correct_num / correct.length) * 100).toFixed(1) + "%)"
       return [correction_num, result_record]
     # 採点結果を描画するための関数
     generateResultDisp = (correction_num, result_record) ->
       $submission_num.html(correction_num)
       $result_record.text(result_record)
+    # レベル選択画面に遷移するための関数
+    transitionToLevelDisp = ->
+      $level_info_disp.hide()
+      $show_num_disp.hide()
+      $answer_disp.hide()
+      $result_disp.hide()
+      $level_disp.fadeIn()
     # 諸々を初期化用関数
     init = ->
       $answerInput.val("")
       $answerErrorBox.empty()
+      # screenTransition関数で取得した全てのタイマーIDをクリアする
+      for timerId in timerIds then clearTimeout(timerId)
+      clearTimeout(timerIDForCountDown)
 
 
     ## イベント処理
@@ -137,6 +195,7 @@
     $level_btn.click ->
       # 選択したレベルの情報を配列として取得。[レベル, 桁数, 秒数]が入る。
       level_info_array = $(this).data('level_info')
+      time_until_answer_disp_is_showed = LEVEL_INFO_DISP_TIME + (level_info_array[2] * 1000)
       # レベル情報画面にレベル情報をセット
       setLevelInfoDisp(level_info_array)
       # 問題画面と結果画面に正解をセットする
@@ -148,14 +207,15 @@
       # レベル情報表示画面 => 問題画面を表示する画面
       screenTransition($level_info_disp, $show_num_disp, LEVEL_INFO_DISP_TIME)
       # 記憶対象となる数値を表示する画面 => 回答画面
-      screenTransition($show_num_disp, $answer_disp, (LEVEL_INFO_DISP_TIME + level_info_array[2] * 1000))
+      setTimeout(countDownTimer(level_info_array[2] * 1000, level_info_array[1]), LEVEL_INFO_DISP_TIME)
+      screenTransition($show_num_disp, $answer_disp, time_until_answer_disp_is_showed)
     # 回答ボタン選択時
     $answerBtn.click ->
       REGEX = /^[0-9]*$/
       if REGEX.exec($answerInput.val())
         # 回答画面 => 結果表示画面
         screenTransition($answer_disp, $result_disp, DONT_WAIT_TIME)
-        [correction_num, result_record] = checkAnswer($answerInput.val(), $show_num_disp.text())
+        [correction_num, result_record] = checkAnswer($answerInput.val(), $show_num_area.text())
         generateResultDisp(correction_num, result_record)
       else
         $answerErrorBox.text("入力した値に誤りがあります。（数値のみ）")
@@ -164,4 +224,4 @@
       # 諸々を初期化用関数
       init()
       # 結果表示画面 => レベル選択画面
-      screenTransition($result_disp, $level_disp, DONT_WAIT_TIME)
+      transitionToLevelDisp()
