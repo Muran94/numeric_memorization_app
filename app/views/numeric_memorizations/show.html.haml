@@ -47,6 +47,7 @@
     %span#show_num_area
     %span#count_down_disp
     .reset レベル選択
+    #toAnswerDisp 回答画面へ
 
   #answer_disp
     %input#answerInput{type: "tel"}
@@ -80,6 +81,7 @@
     $show_num_disp = $('#show_num_disp')
     $show_num_area = $('#show_num_area')
     $count_down_disp = $('#count_down_disp')
+    $toAnswerDisp = $('#toAnswerDisp')
     # 回答画面のプロパティー
     $answer_disp = $('#answer_disp')
     $answerInput = $('#answerInput') # 回答フォーム
@@ -195,3 +197,7 @@
       init()
       # 結果表示画面 => レベル選択画面
       transitionToLevelDisp()
+
+    $toAnswerDisp.click ->
+      clearTimeout(timerIDForCountDown)
+      screenTransition($show_num_disp, $answer_disp, DONT_WAIT_TIME)
