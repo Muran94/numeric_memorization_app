@@ -123,7 +123,7 @@
     # 問題画面と結果画面に正解をセットする
     setCorrectAnswerToDisp = (memorize_this_num) ->
       $show_num_area.html(memorize_this_num)
-      $correct_num.text(memorize_this_num)
+      $correct_num.html(memorize_this_num)
     # 回答フォームの入力の上限値を追加する
     setMaxLengthToInput = (max_length) ->
       $answerInput.attr('maxlength', max_length)
@@ -148,6 +148,7 @@
         else
           if answer[i] is undefined then correction_num += "<span style='color:tomato;'>_</span>"
           else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
+        correction_num += '<br>' if (i + 1) % 10 is 0
       result_record = correct_num + "/" + correct.length + " (" + ((correct_num / correct.length) * 100).toFixed(1) + "%)"
       return [correction_num, result_record]
     # 採点結果を描画するための関数
@@ -203,5 +204,7 @@
       transitionToLevelDisp()
 
     $toAnswerDisp.click ->
+      clearTimeout(timerIDForCountDown)
+      for timerId in timerIds then clearTimeout(timerId)
       clearTimeout(timerIDForCountDown)
       screenTransition($show_num_disp, $answer_disp, DONT_WAIT_TIME)
