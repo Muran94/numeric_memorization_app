@@ -2,46 +2,46 @@
 #container
   #level_disp
     %ul
-      %li.level_btn{"data-level_info" => [1, 10, 60]}
+      %li.level_btn{"data-level_info" => [1, 10, 50]}
         LEVEL1
         .level_info
-          10桁 | 60秒
-      %li.level_btn{"data-level_info" => [2, 10, 50]}
+          10桁 | 50秒
+      %li.level_btn{"data-level_info" => [2, 10, 40]}
         LEVEL2
         .level_info
-          10桁 | 50秒
-      %li.level_btn{"data-level_info" => [3, 10, 40]}
+          10桁 | 40秒
+      %li.level_btn{"data-level_info" => [3, 10, 30]}
         LEVEL3
         .level_info
-          10桁 | 40秒
-      %li.level_btn{"data-level_info" => [4, 10, 30]}
+          10桁 | 30秒
+      %li.level_btn{"data-level_info" => [4, 10, 20]}
         LEVEL4
         .level_info
-          10桁 | 30秒
-      %li.level_btn{"data-level_info" => [5, 10, 20]}
+          10桁 | 20秒
+      %li.level_btn{"data-level_info" => [5, 10, 10]}
         LEVEL5
         .level_info
-          10桁 | 20秒
-      %li.level_btn{"data-level_info" => [6, 10, 10]}
+          10桁 | 10秒
+      %li.level_btn{"data-level_info" => [6, 20, 50]}
         LEVEL6
         .level_info
-          10桁 | 10秒
-      %li.level_btn{"data-level_info" => [7, 15, 20]}
+          20桁 | 50秒
+      %li.level_btn{"data-level_info" => [7, 20, 40]}
         LEVEL7
         .level_info
-          15桁 | 20秒
-      %li.level_btn{"data-level_info" => [8, 15, 15]}
+          20桁 | 40秒
+      %li.level_btn{"data-level_info" => [8, 20, 30]}
         LEVEL8
         .level_info
-          15桁 | 15秒
+          20桁 | 30秒
       %li.level_btn{"data-level_info" => [9, 20, 20]}
         LEVEL9
         .level_info
           20桁 | 20秒
-      %li.level_btn{"data-level_info" => [10, 30, 30]}
+      %li.level_btn{"data-level_info" => [10, 20, 10]}
         LEVEL10
         .level_info
-          30桁 | 30秒
+          20桁 | 10秒
 
   #show_num_disp
     %span#show_num_area
@@ -114,11 +114,15 @@
     # 記憶対象の数値を生成する関数
     generateNum = (digit) ->
       problemNum = ""
-      for i in [1..digit] then problemNum += String(Math.floor(Math.random() * 10))
+      for i in [1..digit]
+        if i % 10 is 0
+          problemNum += String(Math.floor(Math.random() * 10)) + "<br>"
+        else
+          problemNum += String(Math.floor(Math.random() * 10))
       return problemNum
     # 問題画面と結果画面に正解をセットする
     setCorrectAnswerToDisp = (memorize_this_num) ->
-      $show_num_area.text(memorize_this_num)
+      $show_num_area.html(memorize_this_num)
       $correct_num.text(memorize_this_num)
     # 回答フォームの入力の上限値を追加する
     setMaxLengthToInput = (max_length) ->
