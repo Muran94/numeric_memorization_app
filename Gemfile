@@ -25,6 +25,7 @@ gem 'pry-rails', :group => :development
 gem "view_source_map", :group => :development
 gem 'pry-byebug'
 gem 'rails_best_practices', require: false
+gem 'google-analytics-rails'
 
 group :development, :test do
   gem 'sqlite3'
