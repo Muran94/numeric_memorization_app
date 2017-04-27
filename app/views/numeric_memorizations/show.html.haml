@@ -129,12 +129,12 @@
       $answerInput.attr('maxlength', max_length)
     # カウントダウンタイマーを更新するための関数
     countDownTimer = (time, digit) ->
+      $count_down_disp.text((time / SECOND).toFixed())
       if time < 0
         clearTimeout(timerIDForCountDown)
         return
       timerIDForCountDown = setTimeout ->
         time -= SECOND
-        $count_down_disp.text((time / SECOND).toFixed())
         countDownTimer(time, digit)
       , SECOND
     # 採点結果を取得するための関数
@@ -183,7 +183,6 @@
       # レベル選択画面 => 問題画面
       screenTransition($level_disp, $show_num_disp, DONT_WAIT_TIME)
       # 記憶対象となる数値を表示する画面 => 回答画面
-      $count_down_disp.text((time_until_answer_disp_is_showed / SECOND).toFixed())
       countDownTimer(time_until_answer_disp_is_showed, level_info_array[1])
       screenTransition($show_num_disp, $answer_disp, time_until_answer_disp_is_showed)
     # 回答ボタン選択時
