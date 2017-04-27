@@ -2,6 +2,7 @@
 #container
   #level_disp
     %ul
+      -# %li.level_btn{"data-level_info" => [1, 1, 1]}
       %li.level_btn{"data-level_info" => [1, 10, 50]}
         LEVEL1
         .level_info
@@ -70,6 +71,18 @@
         %td#result_record
     .reset レベルを選択する
 
+#sakura_disp
+  %section#sakura
+    .inner
+      .flake1
+      .flake2
+      .flake3
+      .flake4
+      .flake5
+      .flake6
+      .flake7
+      .flake8
+
 
 :coffee
   $ ->
@@ -93,6 +106,8 @@
     $correct_num = $('#correct_num')
     $result_record = $('#result_record')
     $reset = $('.reset')
+
+    $sakura_disp = $('#sakura_disp')
 
 
     ## グローバル変数・定数定義
@@ -137,26 +152,33 @@
         time -= SECOND
         countDownTimer(time, digit)
       , SECOND
+    # 全ての数字が正しければ桜を表示
+    show_sakura_disp = (correct_count, digit_length) ->
+      if correct_count is digit_length
+        $sakura_disp.fadeIn()
+        $(document.body).css('background', '#f6e2ea')
     # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
-      correct_num = 0
+      correct_count = 0
       correction_num = ""
       for i in [0...correct.length]
         if answer[i] is correct[i]
-          correct_num++
+          correct_count++
           correction_num += correct[i]
         else
           if answer[i] is undefined then correction_num += "<span style='color:tomato;'>_</span>"
           else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
         correction_num += '<br>' if (i + 1) % 10 is 0
-      result_record = correct_num + "/" + correct.length + " (" + ((correct_num / correct.length) * 100).toFixed(1) + "%)"
-      return [correction_num, result_record]
+      result_record = correct_count + "/" + correct.length + " (" + ((correct_count / correct.length) * 100).toFixed(1) + "%)"
+      show_sakura_disp(correct_count, correct.length)
+      return [correction_num, result_record, correct_count]
     # 採点結果を描画するための関数
     generateResultDisp = (correction_num, result_record) ->
       $submission_num.html(correction_num)
       $result_record.text(result_record)
     # レベル選択画面に遷移するための関数
     transitionToLevelDisp = ->
+      $sakura_disp.hide()
       $show_num_disp.hide()
       $answer_disp.hide()
       $result_disp.hide()
@@ -165,6 +187,7 @@
     init = ->
       $answerInput.val("")
       $answerErrorBox.empty()
+      $(document.body).css('background', '#fff')
       # screenTransition関数で取得した全てのタイマーIDをクリアする
       for timerId in timerIds then clearTimeout(timerId)
       clearTimeout(timerIDForCountDown)
@@ -191,7 +214,7 @@
       if REGEX.exec($answerInput.val())
         # 回答画面 => 結果表示画面
         screenTransition($answer_disp, $result_disp, DONT_WAIT_TIME)
-        [correction_num, result_record] = checkAnswer($answerInput.val(), $show_num_area.text())
+        [correction_num, result_record, correct_count] = checkAnswer($answerInput.val(), $show_num_area.text())
         generateResultDisp(correction_num, result_record)
       else
         $answerErrorBox.text("入力した値に誤りがあります。（数値のみ）")
