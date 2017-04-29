@@ -153,10 +153,18 @@
         countDownTimer(time, digit)
       , SECOND
     # 全ての数字が正しければ桜を表示
-    show_sakura_disp = (correct_count, digit_length) ->
-      if correct_count is digit_length
-        $sakura_disp.fadeIn()
-        $(document.body).css('background', '#f6e2ea')
+    show_sakura_disp = (isPerferct) ->
+      $sakura_disp.fadeIn()
+      $(document.body).css('background', '#f6e2ea')
+    # 結果をajaxで送信
+    sendAjax = (point, isPerferct)->
+      $.ajax
+        url: "/numeric_memorizations",
+        type: "POST",
+        data:
+          point: point
+          cleared: isPerferct
+
     # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
       correct_count = 0
@@ -170,7 +178,9 @@
           else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
         correction_num += '<br>' if (i + 1) % 10 is 0
       result_record = correct_count + "/" + correct.length + " (" + ((correct_count / correct.length) * 100).toFixed(1) + "%)"
-      show_sakura_disp(correct_count, correct.length)
+      isPerferct = if correct_count is correct.length then true else false
+      sendAjax(correct_count, isPerferct)
+      show_sakura_disp(isPerferct) if isPerferct
       return [correction_num, result_record, correct_count]
     # 採点結果を描画するための関数
     generateResultDisp = (correction_num, result_record) ->
