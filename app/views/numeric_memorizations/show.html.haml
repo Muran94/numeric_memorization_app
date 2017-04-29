@@ -2,47 +2,14 @@
 #container
   #level_disp
     %ul
-      -# %li.level_btn{"data-level_info" => [1, 1, 1]}
-      %li.level_btn{"data-level_info" => [1, 10, 50]}
-        LEVEL1
-        .level_info
-          10桁 | 50秒
-      %li.level_btn{"data-level_info" => [2, 10, 40]}
-        LEVEL2
-        .level_info
-          10桁 | 40秒
-      %li.level_btn{"data-level_info" => [3, 10, 30]}
-        LEVEL3
-        .level_info
-          10桁 | 30秒
-      %li.level_btn{"data-level_info" => [4, 10, 20]}
-        LEVEL4
-        .level_info
-          10桁 | 20秒
-      %li.level_btn{"data-level_info" => [5, 10, 10]}
-        LEVEL5
-        .level_info
-          10桁 | 10秒
-      %li.level_btn{"data-level_info" => [6, 20, 50]}
-        LEVEL6
-        .level_info
-          20桁 | 50秒
-      %li.level_btn{"data-level_info" => [7, 20, 40]}
-        LEVEL7
-        .level_info
-          20桁 | 40秒
-      %li.level_btn{"data-level_info" => [8, 20, 30]}
-        LEVEL8
-        .level_info
-          20桁 | 30秒
-      %li.level_btn{"data-level_info" => [9, 20, 20]}
-        LEVEL9
-        .level_info
-          20桁 | 20秒
-      %li.level_btn{"data-level_info" => [10, 20, 10]}
-        LEVEL10
-        .level_info
-          20桁 | 10秒
+      - @time_limit_single_leve_infos.each do |level_info|
+        - level = level_info[:level]
+        - length = level_info[:length]
+        - time = level_info[:time]
+        %li.level_btn{"data-level_info" => [level, length, time]}
+          = "LEVEL#{level}"
+          .level_info
+            = "#{length}桁 | #{time}秒"
 
   #show_num_disp
     %span#show_num_area

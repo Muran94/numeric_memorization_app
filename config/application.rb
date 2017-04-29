@@ -8,7 +8,7 @@ Bundler.require(*Rails.groups)
 module NumericMemorize
   class Application < Rails::Application
 
-    config.serve_static_assets = true
+    config.serve_static_files = true
 
     config.generators do |g|
       g.test_framework :rspec,

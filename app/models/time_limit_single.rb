@@ -8,7 +8,10 @@
 #  cleared    :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  user_id    :string
+#  integer    :string
 #
 
 class TimeLimitSingle < ActiveRecord::Base
+  belongs_to :user
 end
