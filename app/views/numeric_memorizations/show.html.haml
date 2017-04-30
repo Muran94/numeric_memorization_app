@@ -134,7 +134,6 @@
         correction_num += '<br>' if (i + 1) % 10 is 0
       result_record = correct_count + "/" + correct.length + " (" + ((correct_count / correct.length) * 100).toFixed(1) + "%)"
       isPerfect = if correct_count is correct.length then true else false
-      show_sakura_disp(isPerfect) if isPerfect
       return [correction_num, result_record, correct_count, isPerfect]
     # 採点結果を描画するための関数
     generateResultDisp = (correction_num, result_record) ->
