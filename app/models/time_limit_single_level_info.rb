@@ -11,4 +11,10 @@
 #
 
 class TimeLimitSingleLevelInfo < ActiveRecord::Base
+  def get_level_length_and_time
+    level = self[:level]
+    length = self[:length]
+    time = self[:time]
+    return level, length, time
+  end
 end

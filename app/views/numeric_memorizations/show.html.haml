@@ -1,9 +1,7 @@
 #level_disp
   %ul
     - @time_limit_single_leve_infos.each do |level_info|
-      - level = level_info[:level]
-      - length = level_info[:length]
-      - time = level_info[:time]
+      - level, length, time = level_info.get_level_length_and_time
       - if user_signed_in? && @completed_levels.include?(level)
         %li.level_btn.completed{"data-level_info" => [level, length, time]}
           = "LEVEL#{level}"
@@ -87,10 +85,8 @@
     generateNum = (digit) ->
       problemNum = ""
       for i in [1..digit]
-        if i % 10 is 0
-          problemNum += String(Math.floor(Math.random() * 10)) + "<br>"
-        else
-          problemNum += String(Math.floor(Math.random() * 10))
+        problemNum += String(Math.floor(Math.random() * 10))
+        problemNum += "<br>" if i % 10 is 0 # 1行につき10桁表示
       return problemNum
     # 問題画面と結果画面に正解をセットする
     setCorrectAnswerToDisp = (memorize_this_num) ->
@@ -109,8 +105,8 @@
         time -= SECOND
         countDownTimer(time, digit)
       , SECOND
-    updateLevelButtonStyle = (level) ->
-      $level_btn[level-1].className = 'level_btn completed' # jQueryの要素
+    # 満点を取ったレベルは灰色にする。
+    updateLevelButtonStyle = (level) -> $level_btn[level-1].className = 'level_btn completed' # jQueryの要素
     # 結果をajaxで送信
     sendAjax = (level, point, isPerfect)->
       $.ajax
@@ -119,9 +115,9 @@
         data:
           level: level
           point: point
-          cleared: isPerfect # 満点ならtrue,
-    # 採点結果を取得するための関数
-    checkAnswer = (answer, correct) ->
+          cleared: isPerfect # 満点ならtrue
+    # 回答と、正しい答えを比較し、赤をいれる
+    returnCorrectionNum = (answer, correct) ->
       correct_count = 0
       correction_num = ""
       for i in [0...correct.length]
@@ -132,6 +128,10 @@
           if answer[i] is undefined then correction_num += "<span style='color:tomato;'>_</span>"
           else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
         correction_num += '<br>' if (i + 1) % 10 is 0
+      return [correct_count, correction_num]
+    # 採点結果を取得するための関数
+    checkAnswer = (answer, correct) ->
+      [correct_count, correction_num] = returnCorrectionNum(answer, correct)
       result_record = correct_count + "/" + correct.length + " (" + ((correct_count / correct.length) * 100).toFixed(1) + "%)"
       isPerfect = if correct_count is correct.length then true else false
       return [correction_num, result_record, correct_count, isPerfect]

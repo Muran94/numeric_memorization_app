@@ -5,9 +5,15 @@ class NumericMemorizationsController < ApplicationController
   end
 
   def create
-    if current_user
-      @time_limit_single = current_user.time_limit_singles.build(time_limit_single_params)
-      @time_limit_single.save
+    respond_to do |format|
+      format.js do
+        if current_user
+          @time_limit_single = current_user.time_limit_singles.build(time_limit_single_params)
+          @time_limit_single.save
+          render nothing: true
+        end
+      end
+      format.html
     end
   end
 
