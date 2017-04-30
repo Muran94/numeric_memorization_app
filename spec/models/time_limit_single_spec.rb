@@ -4,12 +4,11 @@
 #
 #  id         :integer          not null, primary key
 #  point      :integer
-#  correction :string
 #  cleared    :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  user_id    :string
-#  integer    :string
+#  level      :integer
 #
 
 require 'rails_helper'

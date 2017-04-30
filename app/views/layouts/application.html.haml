@@ -14,40 +14,31 @@
 
   %body
 
-    %header
-      #h-logo
-        = link_to "NUME", root_path
-      #h-open-menu
-        %i.fa.fa-bars
 
-    #cover
     #menu
-      %i.fa.fa-times#close
-      %ul
-        - unless user_signed_in?
-          %li
-            = link_to "ログイン", new_user_session_path
-          %li
-            = link_to "会員登録", new_user_registration_path
-        - else
-          %li
-            = link_to "ログアウト", destroy_user_session_path, method: :delete
+      = link_to "トップ", root_path, class: "nav-brand"
+      - unless user_signed_in?
+        = link_to "ログイン", new_user_session_path
+        = link_to "会員登録", new_user_registration_path
+      - else
+        = link_to "ログアウト", destroy_user_session_path, method: :delete
 
-    = yield
+    #main
+      %header
+        #h-logo
+          = link_to "NUME", root_path
+        #h-open-menu
+          %i.fa.fa-bars
+
+      #container
+        = yield
 
 :coffee
   $ ->
     # プロパティー系
     $h_open_menu = $('#h-open-menu')
-    $cover = $('#cover')
-    $menu = $('#menu')
-    $close = $('#close')
+    $main = $('#main')
 
     ## イベント系
     $h_open_menu.click ->
-      $cover.fadeIn()
-      $menu.fadeIn()
-
-    $close.click ->
-      $cover.fadeOut()
-      $menu.fadeOut()
+      $main.toggleClass('open-menu')

@@ -1,54 +1,46 @@
--# @TODO レベル選択ボタンを動的に作成できるようにする。
-#container
-  #level_disp
-    %ul
-      - @time_limit_single_leve_infos.each do |level_info|
-        - level = level_info[:level]
-        - length = level_info[:length]
-        - time = level_info[:time]
+#level_disp
+  %ul
+    - @time_limit_single_leve_infos.each do |level_info|
+      - level = level_info[:level]
+      - length = level_info[:length]
+      - time = level_info[:time]
+      - if user_signed_in? && @completed_levels.include?(level)
+        %li.level_btn.completed{"data-level_info" => [level, length, time]}
+          = "LEVEL#{level}"
+          .level_info
+            = "#{length}桁 | #{time}秒"
+      - else
         %li.level_btn{"data-level_info" => [level, length, time]}
           = "LEVEL#{level}"
           .level_info
             = "#{length}桁 | #{time}秒"
 
-  #show_num_disp
-    %span#show_num_area
-    %span#count_down_disp
-    .reset レベル選択
-    #toAnswerDisp 回答画面へ
+#show_num_disp
+  %span#show_num_area
+  %span#count_down_disp
+  .reset レベル選択
+  #toAnswerDisp 回答画面へ
 
-  #answer_disp
-    %input#answerInput{type: "tel"}
-    #answerErrorBox
-    #answerBtn 答える
+#answer_disp
+  %input#answerInput{type: "tel"}
+  #answerErrorBox
+  #answerBtn 答える
 
-  #result_disp
-    %table
-      %tr
-        %th あなたの回答
-      %tr
-        %td#submission_num
-      %tr
-        %th 正解
-      %tr
-        %td#correct_num
-      %tr
-        %th 成績
-      %tr
-        %td#result_record
-    .reset レベルを選択する
-
-#sakura_disp
-  %section#sakura
-    .inner
-      .flake1
-      .flake2
-      .flake3
-      .flake4
-      .flake5
-      .flake6
-      .flake7
-      .flake8
+#result_disp
+  %table
+    %tr
+      %th あなたの回答
+    %tr
+      %td#submission_num
+    %tr
+      %th 正解
+    %tr
+      %td#correct_num
+    %tr
+      %th 成績
+    %tr
+      %td#result_record
+  .reset レベルを選択する
 
 
 :coffee
@@ -73,8 +65,6 @@
     $correct_num = $('#correct_num')
     $result_record = $('#result_record')
     $reset = $('.reset')
-
-    $sakura_disp = $('#sakura_disp')
 
 
     ## グローバル変数・定数定義
@@ -119,19 +109,17 @@
         time -= SECOND
         countDownTimer(time, digit)
       , SECOND
-    # 全ての数字が正しければ桜を表示
-    show_sakura_disp = (isPerferct) ->
-      $sakura_disp.fadeIn()
-      $(document.body).css('background', '#f6e2ea')
+    updateLevelButtonStyle = (level) ->
+      $level_btn[level-1].className = 'level_btn completed' # jQueryの要素
     # 結果をajaxで送信
-    sendAjax = (point, isPerferct)->
+    sendAjax = (level, point, isPerfect)->
       $.ajax
         url: "/numeric_memorizations",
         type: "POST",
         data:
+          level: level
           point: point
-          cleared: isPerferct
-
+          cleared: isPerfect # 満点ならtrue,
     # 採点結果を取得するための関数
     checkAnswer = (answer, correct) ->
       correct_count = 0
@@ -145,17 +133,15 @@
           else correction_num += "<span style='color:tomato;'>" + answer[i] + "</span>"
         correction_num += '<br>' if (i + 1) % 10 is 0
       result_record = correct_count + "/" + correct.length + " (" + ((correct_count / correct.length) * 100).toFixed(1) + "%)"
-      isPerferct = if correct_count is correct.length then true else false
-      sendAjax(correct_count, isPerferct)
-      show_sakura_disp(isPerferct) if isPerferct
-      return [correction_num, result_record, correct_count]
+      isPerfect = if correct_count is correct.length then true else false
+      show_sakura_disp(isPerfect) if isPerfect
+      return [correction_num, result_record, correct_count, isPerfect]
     # 採点結果を描画するための関数
     generateResultDisp = (correction_num, result_record) ->
       $submission_num.html(correction_num)
       $result_record.text(result_record)
     # レベル選択画面に遷移するための関数
     transitionToLevelDisp = ->
-      $sakura_disp.hide()
       $show_num_disp.hide()
       $answer_disp.hide()
       $result_disp.hide()
@@ -176,6 +162,7 @@
       # 選択したレベルの情報を配列として取得。[レベル, 桁数, 秒数]が入る。
       level_info_array = $(this).data('level_info')
       time_until_answer_disp_is_showed = level_info_array[2] * 1000
+      $answerBtn.data('level', level_info_array[0]) # 答えを押した時に、選択レベルの情報が必要なため、dataで持たせてる
       # 問題画面と結果画面に正解をセットする
       setCorrectAnswerToDisp(generateNum(level_info_array[1]))
       # 回答フォームの入力の上限値を追加する
@@ -188,10 +175,13 @@
     # 回答ボタン選択時
     $answerBtn.click ->
       REGEX = /^[0-9]*$/
+      level = $(this).data('level')
       if REGEX.exec($answerInput.val())
         # 回答画面 => 結果表示画面
         screenTransition($answer_disp, $result_disp, DONT_WAIT_TIME)
-        [correction_num, result_record, correct_count] = checkAnswer($answerInput.val(), $show_num_area.text())
+        [correction_num, result_record, correct_count, isPerfect] = checkAnswer($answerInput.val(), $show_num_area.text())
+        updateLevelButtonStyle(level) if isPerfect
+        sendAjax(level, correct_count, isPerfect)
         generateResultDisp(correction_num, result_record)
       else
         $answerErrorBox.text("入力した値に誤りがあります。（数値のみ）")

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170429141652) do
+ActiveRecord::Schema.define(version: 20170430034242) do
 
   create_table "time_limit_single_level_infos", force: :cascade do |t|
     t.integer  "level"
@@ -23,12 +23,11 @@ ActiveRecord::Schema.define(version: 20170429141652) do
 
   create_table "time_limit_singles", force: :cascade do |t|
     t.integer  "point"
-    t.string   "correction"
     t.boolean  "cleared"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string   "user_id"
-    t.string   "integer"
+    t.integer  "level"
   end
 
   create_table "users", force: :cascade do |t|
