@@ -21,6 +21,7 @@ module NumericMemorize
       g.fixture_replacement :factory_girl, dir: "spec/factories"
     end
 
+    config.i18n.default_locale = :ja
     config.active_record.raise_in_transactional_callbacks = true
   end
 end
